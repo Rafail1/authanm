@@ -13,7 +13,10 @@ export class RegisterComponent implements OnInit {
     email: string;
     name: string;
     submitted: boolean;
-    constructor(private http: HttpClient, private notify: NotificationsService) {}
+    message: string;
+    constructor(private http: HttpClient, private notify: NotificationsService) {
+
+    }
 
     register(form) {
         this.http.post<any>('/api/register', {
@@ -24,8 +27,8 @@ export class RegisterComponent implements OnInit {
         }).subscribe(
                 data => {
                     if (!data.error) {
-                        form.reset();
-                        this.notify.success('Успешно!', data['message']);
+                        this.submitted = true;
+                        this.message = data['message'];
                     } else {
                         this.notify.error(
                             'Ошибка',
@@ -34,6 +37,32 @@ export class RegisterComponent implements OnInit {
                     }
                 }
             );
+    }
+    resend() {
+        if (!this.email) {
+            this.notify.error(
+                'Ошибка',
+                'отсутствует email'
+            );
+            return;
+        }
+        this.http.post<any>('/api/resend', {
+            email: this.email
+        }).subscribe(
+            data => {
+                if (!data.error) {
+                    this.notify.success(
+                        'Успешно!',
+                        data.message
+                    );
+                } else {
+                    this.notify.error(
+                        'Ошибка',
+                        data.message
+                    );
+                }
+            }
+        );
     }
 
     ngOnInit() {

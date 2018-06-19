@@ -16,6 +16,7 @@ module.exports = function (router) {
                 name: req.body.name,
                 email: req.body.email,
                 confirm_hash:confirm_hash,
+                last_send: new Date(),
                 password: hashedPassword
             },
             function (err, user) {
@@ -28,11 +29,31 @@ module.exports = function (router) {
                     }
                     return res.send({error: true, message:LNG.getMessage(message)});
                 }
-
                 MailHelper.sendConfirm(req.body.email, confirm_hash);
                 res.json({message: 'На Ваш email высланы дальнейшие инструкции.'});
             });
     });
+    router.post('/resend', function (req, res) {
+        User.findOne({email: req.body.email}, function (err, user) {
+            if (err) return res.json({error: true, message: 'Ошибка сервера'});
+            if (!user) return res.json({error: true, message: 'Пользователь не найдет'});
+            if (user.confirmed) return res.json({error: true, message: 'Email уже подтверждён'});
+            console.log(new Date().getTime() ,user.last_send.getTime(), new Date().getTime() - user.last_send.getTime());
+            if(new Date().getTime() - user.last_send.getTime() > 59000) {
+                MailHelper.sendConfirm(req.body.email, user.confirm_hash);
+                user.last_send = new Date();
+                user.save(function (err) {
+                    if (err) {
+                        console.error(err);
+                    }
+                });
+                res.json({message: 'Письмо выслано повторно'});
+            } else {
+                res.json({error: true, message: 'Слишком часто'});
+            }
+        });
+    });
+
     router.post('/confirm', function (req, res) {
         const confirm_hash = req.body.h;
         User.findOne({confirm_hash : confirm_hash, confirmed: false }, function (err, user) {
