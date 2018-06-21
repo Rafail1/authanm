@@ -11,20 +11,23 @@ import { LoginComponent } from './login/login.component';
 import { RegisterComponent } from './register/register.component';
 import {
     AuthGuardService as AuthGuard
-} from './auth/auth-guard.service';
+} from './services/auth/auth-guard.service';
 import {
     RoleGuardService as RoleGuard
-} from './auth/role-guard.service';
+} from './services/auth/role-guard.service';
 import { MeComponent } from './me/me.component';
 import { AdminComponent } from './admin/admin.component';
-import {AuthService} from './auth/auth.service';
+import {AuthService} from './services/auth/auth.service';
 import {JwtHelper} from 'angular2-jwt';
 import {GlobalErrorHandler} from './interceptors/global-error-handler';
 import {PassValidator} from './directives/password-validator.directive';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
-import {NotAuthGuardService} from './auth/not-auth-guard.service';
+import {NotAuthGuardService} from './services/auth/not-auth-guard.service';
 import { HomeComponent } from './home/home.component';
 import { ConfirmComponent } from './confirm/confirm.component';
+import {RegisterService} from './services/auth/register.service';
+import {NotifyService} from './services/notify.service';
+import { PasswordResetComponent } from './password-reset/password-reset.component';
 const appRoutes: Routes = [
     {
         path: 'login',
@@ -62,6 +65,11 @@ const appRoutes: Routes = [
         path: 'home',
         component: HomeComponent,
         canActivate: [AuthGuard]
+    },
+    {
+        path: 'password-reset',
+        component: PasswordResetComponent,
+        canActivate: [NotAuthGuardService]
     }
 ];
 @NgModule({
@@ -74,7 +82,8 @@ const appRoutes: Routes = [
     PassValidator,
     EqualValidator,
     HomeComponent,
-    ConfirmComponent
+    ConfirmComponent,
+    PasswordResetComponent
   ],
     imports: [
         BrowserModule,
@@ -87,7 +96,7 @@ const appRoutes: Routes = [
         ),
         SimpleNotificationsModule.forRoot()
     ],
-    providers: [AuthGuard, AuthService, NotAuthGuardService, JwtHelper, {
+    providers: [AuthGuard, AuthService, NotifyService, RegisterService, NotAuthGuardService, JwtHelper, {
         provide: ErrorHandler,
         useClass: GlobalErrorHandler
     }],

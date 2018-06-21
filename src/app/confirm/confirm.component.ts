@@ -1,7 +1,7 @@
 import {Component, OnDestroy, OnInit} from '@angular/core';
 import {HttpClient} from '@angular/common/http';
 import {ActivatedRoute, Router} from '@angular/router';
-import {AuthService} from '../auth/auth.service';
+import {AuthService} from '../services/auth/auth.service';
 import {NotificationsService} from 'angular2-notifications';
 
 @Component({

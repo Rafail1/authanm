@@ -1,6 +1,7 @@
 import {Component, OnInit} from '@angular/core';
 import {HttpClient} from '@angular/common/http';
-import {NotificationsService} from 'angular2-notifications';
+import {RegisterService} from '../services/auth/register.service';
+import {NotifyService} from '../services/notify.service';
 
 @Component({
     selector: 'app-register',
@@ -14,55 +15,30 @@ export class RegisterComponent implements OnInit {
     name: string;
     submitted: boolean;
     message: string;
-    constructor(private http: HttpClient, private notify: NotificationsService) {
+    unconfirmed: boolean;
+    constructor(private http: HttpClient, private notify: NotifyService, private rService: RegisterService) {
 
     }
 
-    register(form) {
-        this.http.post<any>('/api/register', {
+    register() {
+        this.rService.register({
             email: this.email,
             name: this.name,
             password: this.password,
             passwordConfirm: this.passwordConfirm,
-        }).subscribe(
-                data => {
-                    if (!data.error) {
-                        this.submitted = true;
-                        this.message = data['message'];
-                    } else {
-                        this.notify.error(
-                            'Ошибка',
-                            data.message
-                        );
-                    }
-                }
-            );
+        }).subscribe(data => {
+            if (data.error && data.code === 'resend') {
+                this.unconfirmed = true;
+            }
+            this.notify.notify(data);
+        });
     }
     resend() {
         if (!this.email) {
-            this.notify.error(
-                'Ошибка',
-                'отсутствует email'
-            );
+            this.notify.notify({error: true, message: 'отсутствует email'});
             return;
         }
-        this.http.post<any>('/api/resend', {
-            email: this.email
-        }).subscribe(
-            data => {
-                if (!data.error) {
-                    this.notify.success(
-                        'Успешно!',
-                        data.message
-                    );
-                } else {
-                    this.notify.error(
-                        'Ошибка',
-                        data.message
-                    );
-                }
-            }
-        );
+        this.rService.resend(this.email).subscribe(data => { this.notify.notify(data); });
     }
 
     ngOnInit() {

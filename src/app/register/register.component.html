@@ -1,7 +1,7 @@
 <div class="container">
     <div class="mt-5">
         <form [hidden]="submitted" class="form-horizontal" role="form" method="POST"
-              (ngSubmit)="register(ngregisterForm)" #ngregisterForm="ngForm">
+              (ngSubmit)="register()" #ngregisterForm="ngForm">
             <div class="row">
                 <div class="col-md-3"></div>
                 <div class="col-md-6">
@@ -68,20 +68,27 @@
                 </div>
                 <div class="col-3">
                     <div [hidden]="ngpasswordConfirm.valid || ngpasswordConfirm.pristine" class="form-control-feedback">
-                       <span class="text-danger align-middle">Пароли не совпадают</span>
+                        <span class="text-danger align-middle">Пароли не совпадают</span>
                     </div>
                 </div>
             </div>
             <div class="row">
-                <div class="col-6 offset-3">
+                <div class="col-4 offset-3">
                     <div class="form-group">
-                        <button type="submit" class="btn btn-success" [disabled]="!ngregisterForm.form.valid">
-                            <i class="fa fa-user-plus"></i>Отправить
-                        </button>
+                        <div class="btn-group" role="group">
+                            <button type="submit" class="btn btn-success" [disabled]="!ngregisterForm.form.valid">
+                                <i class="fa fa-user-plus"></i>Отправить
+                            </button>
+                            <button type="button" [hidden]="!unconfirmed" class="btn btn-primary btn-xs" (click)="resend()"
+                                    role="button">Выслать письмо повторно
+                            </button>
+                        </div>
                     </div>
                 </div>
+
             </div>
         </form>
+
         <div [hidden]="!submitted">
             <div class="text-center">
                 <h1>Спасибо за регистрацию</h1>

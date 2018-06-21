@@ -1,7 +1,8 @@
 import {Component, OnInit} from '@angular/core';
 import {HttpClient} from '@angular/common/http';
 import {Router} from '@angular/router';
-import {NotificationsService} from 'angular2-notifications';
+import {RegisterService} from '../services/auth/register.service';
+import {NotifyService} from '../services/notify.service';
 
 @Component({
     selector: 'app-login',
@@ -10,9 +11,10 @@ import {NotificationsService} from 'angular2-notifications';
 })
 export class LoginComponent implements OnInit {
     email: string;
+    unconfirmed: boolean;
     password: string;
 
-    constructor(private http: HttpClient, private router: Router, private notify: NotificationsService) {
+    constructor(private http: HttpClient, private rService: RegisterService, private router: Router, private notif: NotifyService) {
     }
 
     ngOnInit() {
@@ -27,18 +29,18 @@ export class LoginComponent implements OnInit {
                 if (data.token) {
                     localStorage.setItem('token', data.token);
                     this.router.navigate(['/home']);
-                    this.notify.success('Успешно!', 'добро пожаловать!)');
+                    this.notif.notify({message: 'добро пожаловать!)'});
                 } else {
-                    this.notify.error('Ошибка', data.message);
+                    if (data.code === 'resend') {
+                        this.unconfirmed = true;
+                    }
+                    this.notif.notify(data);
                 }
-            },
-            err => {
-                console.log(err);
-            },
-            () => {
-                console.log('all done');
             }
         );
+    }
+    resend() {
+        this.rService.resend(this.email).subscribe(data => { this.notif.notify(data); });
     }
 
 }

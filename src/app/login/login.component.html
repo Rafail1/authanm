@@ -44,12 +44,18 @@
 
             <div class="row" style="padding-top: 1rem">
                 <div class="col-6 offset-3">
+                    <div class="btn-group">
                     <button type="submit" [disabled]="!ngloginForm.form.valid" class="btn btn-success"><i
                             class="fa fa-sign-in"></i> Войти
                     </button>
-                    <a class="btn btn-link" href="/password/reset">Забыли пароль?</a>
+                    <button [hidden]="!unconfirmed" type="button" [hidden]="!unconfirmed" class="btn btn-primary btn-xs" (click)="resend()"
+                            role="button">Выслать письмо повторно
+                    </button>
+                    </div>
+                    <a class="btn btn-link" [routerLink]="['/password-reset']">Забыли пароль?</a>
                 </div>
             </div>
         </form>
+
     </div>
 </div>

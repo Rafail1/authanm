@@ -9,29 +9,35 @@ const User = mongoose.model('User');
 const MailHelper = require('../models/MailHelper');
 module.exports = function (router) {
     router.post('/register', function (req, res) {
-        const hashedPassword = bcrypt.hashSync(req.body.password, 8);
-        const confirm_hash = randomstring.generate();
-
-        User.create({
-                name: req.body.name,
-                email: req.body.email,
-                confirm_hash:confirm_hash,
-                last_send: new Date(),
-                password: hashedPassword
-            },
-            function (err, user) {
-                if (err) {
-                    let message;
-                    if(err.code === 11000) {
-                        message = 'duplicate_email';
-                    } else {
-                        message = 'register_server_error';
-                    }
+        User.findOne({email: req.body.email}, function (err, user) {
+            let message;
+            if (user) {
+                if(user.confirmed) {
+                    message = 'duplicate_email';
                     return res.send({error: true, message:LNG.getMessage(message)});
                 }
-                MailHelper.sendConfirm(req.body.email, confirm_hash);
-                res.json({message: 'На Ваш email высланы дальнейшие инструкции.'});
-            });
+                message = 'duplicate_email_unconfirmed';
+                return res.send({error: true, code:'resend', message:LNG.getMessage(message)});
+            }
+
+            const hashedPassword = bcrypt.hashSync(req.body.password, 8);
+            const confirm_hash = randomstring.generate();
+            User.create({
+                    name: req.body.name,
+                    email: req.body.email,
+                    confirm_hash:confirm_hash,
+                    last_send: new Date(),
+                    password: hashedPassword
+                },
+                function (err) {
+                    if (err) {
+                        return res.send({error: true, code:code, message:LNG.getMessage('register_server_error')});
+                    }
+                    MailHelper.sendConfirm(req.body.email, confirm_hash);
+                    res.json({message: 'На Ваш email высланы дальнейшие инструкции.'});
+                });
+        });
+
     });
     router.post('/resend', function (req, res) {
         User.findOne({email: req.body.email}, function (err, user) {
@@ -77,7 +83,7 @@ module.exports = function (router) {
         User.findOne({email: req.body.email}, function (err, user) {
             if (err) return res.json({error: true, message:'Ошибка сервера.'});
             if (!user) return res.json({error: true, message:'Неверный логин или пароль'});
-            if (!user.confirmed) return res.json({error: true, message:'Email не подтверждён'});
+            if (!user.confirmed) return res.json({error: true, code:'resend', message:'Email не подтверждён'});
             let passwordIsValid = bcrypt.compareSync(req.body.password, user.password);
             if (!passwordIsValid) return res.json({error: true, message:'Неверный логин или пароль'});
             const token = jwt.sign({ id: user._id, confirmed: !!user.confirmed }, config.secret, {
