@@ -92,6 +92,21 @@ module.exports = function (router) {
             res.json({auth: true, token: token});
         });
     });
+    router.post('/resetPassword', function (req, res) {
+        User.findOne({email: req.body.email}, function (err, user) {
+            if (err) return res.json({error: true, message:'Ошибка сервера.'});
+            if (!user) return res.json({error: true, message:'Такого пользователя нет в системе'});
+            if (!user.confirmed) return res.json({error: true, code:'resend', message:'Email не подтверждён'});
+            const confirm_hash = randomstring.generate();
+
+            User.updateOne(user, {$set:{confirm_hash: confirm_hash}}, function (err) {
+                if (err) return res.json({error: true, message: 'Ошибка сервера'});
+                MailHelper.sendReset(req.body.email, confirm_hash);
+                res.json({message: 'Ссылка на восстановление пароля выслана на email'});
+            });
+
+        });
+    });
     router.get('/logout', function (req, res) {
         res.json({auth: false, token: null});
     });

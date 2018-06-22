@@ -70,6 +70,11 @@ const appRoutes: Routes = [
         path: 'password-reset',
         component: PasswordResetComponent,
         canActivate: [NotAuthGuardService]
+    },
+    {
+        path: 'password-reset/:h',
+        component: PasswordResetComponent,
+        canActivate: [NotAuthGuardService]
     }
 ];
 @NgModule({
