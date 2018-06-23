@@ -27,7 +27,7 @@ module.exports = {
             to: email,
             subject: 'Восстановление пароля',
             text: `для восстановления пароля перейдите по ссылке ${config.url}/password-reset/${hash}`,
-            html: `для восстановления пароля перейдите по ссылке <a href="${config.url}/password-reset/${hash}">${config.url}/confirm/${hash}</a>`
+            html: `для восстановления пароля перейдите по ссылке <a href="${config.url}/password-reset/${hash}">${config.url}/password-reset/${hash}</a>`
         };
         this.send(mailOptions);
     },

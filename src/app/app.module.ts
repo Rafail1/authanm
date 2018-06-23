@@ -1,5 +1,5 @@
 import { FormsModule } from '@angular/forms';
-import {HttpClientModule} from '@angular/common/http';
+import {HTTP_INTERCEPTORS, HttpClientModule} from '@angular/common/http';
 import { BrowserModule } from '@angular/platform-browser';
 import {ErrorHandler, NgModule} from '@angular/core';
 import { AppComponent } from './app.component';
@@ -28,6 +28,7 @@ import { ConfirmComponent } from './confirm/confirm.component';
 import {RegisterService} from './services/auth/register.service';
 import {NotifyService} from './services/notify.service';
 import { PasswordResetComponent } from './password-reset/password-reset.component';
+import {MyHttpInterceptor} from './interceptors/my-http-interceptor';
 const appRoutes: Routes = [
     {
         path: 'login',
@@ -104,7 +105,12 @@ const appRoutes: Routes = [
     providers: [AuthGuard, AuthService, NotifyService, RegisterService, NotAuthGuardService, JwtHelper, {
         provide: ErrorHandler,
         useClass: GlobalErrorHandler
-    }],
+    },
+        {
+            provide: HTTP_INTERCEPTORS,
+            useClass: MyHttpInterceptor,
+            multi: true
+        }],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

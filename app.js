@@ -6,7 +6,7 @@ const bodyParser = require('body-parser');
 const app = express();
 const mongoose = require('mongoose');
 
-app.set('views', path.join(__dirname, '/dist/Raf'));
+app.set('views', path.join(__dirname, '/dist/auth'));
 app.engine('html', require('ejs').renderFile);
 app.set('view engine', 'html');
 mongoose.Promise = require('bluebird');
@@ -18,7 +18,7 @@ mongoose.connect('mongodb://localhost/mean-angular5', { promiseLibrary: require(
 app.use(logger('dev'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({'extended':'false'}));
-app.use(express.static(path.join(__dirname, 'dist/Raf')));
+app.use(express.static(path.join(__dirname, 'dist/auth')));
 
 app.use('/api', api);
 app.get('*', function (req, res) {
