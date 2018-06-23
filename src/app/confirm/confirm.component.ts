@@ -17,26 +17,23 @@ export class ConfirmComponent implements OnInit, OnDestroy {
     }
 
     ngOnInit() {
-        if (this.auth.isAuthenticated()) {
-            return this.router.navigate(['/login']);
-        }
         this.sub = this.route.params.subscribe(params => {
-            if (params['h']) {
-                this.http.post('/api/confirm', {h: params['h']})
-                    .subscribe(data => {
-                        if (data['error']) {
-                            this.notify.error('Ошибка!', data['message']);
-                            this.router.navigate(['/register']);
-                        } else {
-                            this.notify.success('Успешно!', data['message']);
-                            this.router.navigate(['/login']);
-                        }
-                    }, err => {
-                        this.notify.error('Ошибка!', 'Ошибка сервера');
-                    });
-            } else {
-                this.router.navigate(['/login']);
+            if (!params['h']) {
+                this.router.navigate(['/home']);
+                return;
             }
+            this.http.post('/api/confirm', {h: params['h']})
+                .subscribe(data => {
+                    if (data['error']) {
+                        this.notify.error('Ошибка!', data['message']);
+                        this.router.navigate(['/register']);
+                    } else {
+                        this.notify.success('Успешно!', data['message']);
+                        this.router.navigate(['/login']);
+                    }
+                }, err => {
+                    this.notify.error('Ошибка!', 'Ошибка сервера');
+                });
         });
     }
 

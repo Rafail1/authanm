@@ -12,12 +12,12 @@ module.exports = function (router) {
         User.findOne({email: req.body.email}, function (err, user) {
             let message;
             if (user) {
-                if(user.confirmed) {
+                if (user.confirmed) {
                     message = 'duplicate_email';
-                    return res.send({error: true, message:LNG.getMessage(message)});
+                    return res.send({error: true, message: LNG.getMessage(message)});
                 }
                 message = 'duplicate_email_unconfirmed';
-                return res.send({error: true, code:'resend', message:LNG.getMessage(message)});
+                return res.send({error: true, code: 'resend', message: LNG.getMessage(message)});
             }
 
             const hashedPassword = bcrypt.hashSync(req.body.password, 8);
@@ -25,13 +25,13 @@ module.exports = function (router) {
             User.create({
                     name: req.body.name,
                     email: req.body.email,
-                    confirm_hash:confirm_hash,
+                    confirm_hash: confirm_hash,
                     last_send: new Date(),
                     password: hashedPassword
                 },
                 function (err) {
                     if (err) {
-                        return res.send({error: true, code:code, message:LNG.getMessage('register_server_error')});
+                        return res.send({error: true, code: code, message: LNG.getMessage('register_server_error')});
                     }
                     MailHelper.sendConfirm(req.body.email, confirm_hash);
                     res.json({message: 'На Ваш email высланы дальнейшие инструкции.'});
@@ -44,8 +44,7 @@ module.exports = function (router) {
             if (err) return res.json({error: true, message: 'Ошибка сервера'});
             if (!user) return res.json({error: true, message: 'Пользователь не найдет'});
             if (user.confirmed) return res.json({error: true, message: 'Email уже подтверждён'});
-            console.log(new Date().getTime() ,user.last_send.getTime(), new Date().getTime() - user.last_send.getTime());
-            if(new Date().getTime() - user.last_send.getTime() > 59000) {
+            if (new Date().getTime() - user.last_send.getTime() > 59000) {
                 MailHelper.sendConfirm(req.body.email, user.confirm_hash);
                 user.last_send = new Date();
                 user.save(function (err) {
@@ -62,10 +61,10 @@ module.exports = function (router) {
 
     router.post('/confirm', function (req, res) {
         const confirm_hash = req.body.h;
-        User.findOne({confirm_hash : confirm_hash, confirmed: false }, function (err, user) {
+        User.findOne({confirm_hash: confirm_hash, confirmed: false}, function (err, user) {
             if (err) return res.json({error: true, message: 'Ошибка сервера'});
             if (!user) return res.json({error: true, message: 'Пользователь не найдет'});
-            User.updateOne(user, {$set:{confirmed: true}}, function (err) {
+            User.updateOne(user, {$set: {confirmed: true}}, function (err) {
                 if (err) return res.json({error: true, message: 'Ошибка сервера'});
                 res.json({message: 'Email подтвержден'});
             });
@@ -81,25 +80,42 @@ module.exports = function (router) {
     });
     router.post('/login', function (req, res) {
         User.findOne({email: req.body.email}, function (err, user) {
-            if (err) return res.json({error: true, message:'Ошибка сервера.'});
-            if (!user) return res.json({error: true, message:'Неверный логин или пароль'});
-            if (!user.confirmed) return res.json({error: true, code:'resend', message:'Email не подтверждён'});
+            if (err) return res.json({error: true, message: 'Ошибка сервера.'});
+            if (!user) return res.json({error: true, message: 'Неверный логин или пароль'});
+            if (!user.confirmed) return res.json({error: true, code: 'resend', message: 'Email не подтверждён'});
             let passwordIsValid = bcrypt.compareSync(req.body.password, user.password);
-            if (!passwordIsValid) return res.json({error: true, message:'Неверный логин или пароль'});
-            const token = jwt.sign({ id: user._id, confirmed: !!user.confirmed }, config.secret, {
+            if (!passwordIsValid) return res.json({error: true, message: 'Неверный логин или пароль'});
+            const token = jwt.sign({id: user._id, role: user.role}, config.secret, {
                 expiresIn: 86400
             });
             res.json({auth: true, token: token});
         });
     });
+    router.post('/changePassword', function (req, res) {
+        if (!req.body.h || !req.body.password || !req.body.passwordConfirm) {
+            return res.json({error: true, message: 'Ошибка данных'});
+        }
+        User.findOne({confirm_hash: req.body.h, confirmed: true}, function (err, user) {
+            if (err) return res.json({error: true, message: 'Ошибка сервера.'});
+            if (!user) return res.json({error: true, message: 'Такого пользователя нет в системе'});
+            const hashedPassword = bcrypt.hashSync(req.body.password, 8);
+            User.updateOne(user, {$set: {confirm_hash: '', password: hashedPassword}}, function (err) {
+                if (err) return res.json({error: true, message: 'Ошибка сервера'});
+                res.json({message: 'Пароль изменен'});
+            });
+
+        });
+    });
     router.post('/resetPassword', function (req, res) {
         User.findOne({email: req.body.email}, function (err, user) {
-            if (err) return res.json({error: true, message:'Ошибка сервера.'});
-            if (!user) return res.json({error: true, message:'Такого пользователя нет в системе'});
-            if (!user.confirmed) return res.json({error: true, code:'resend', message:'Email не подтверждён'});
+            if (err) return res.json({error: true, message: 'Ошибка сервера.'});
+            if (!user) return res.json({error: true, message: 'Такого пользователя нет в системе'});
+            if (!user.confirmed) return res.json({error: true, code: 'resend', message: 'Email не подтверждён'});
+            if (new Date().getTime() - user.last_send.getTime() < 60000) {
+                return res.json({error: true, message: 'Слишком часто'});
+            }
             const confirm_hash = randomstring.generate();
-
-            User.updateOne(user, {$set:{confirm_hash: confirm_hash}}, function (err) {
+            User.updateOne(user, {$set: {confirm_hash: confirm_hash, last_send: new Date()}}, function (err) {
                 if (err) return res.json({error: true, message: 'Ошибка сервера'});
                 MailHelper.sendReset(req.body.email, confirm_hash);
                 res.json({message: 'Ссылка на восстановление пароля выслана на email'});
