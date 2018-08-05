@@ -30,6 +30,7 @@ export class LoginComponent implements OnInit {
                     localStorage.setItem('token', data.token);
                     this.router.navigate(['/home']);
                     this.notif.notify({message: 'добро пожаловать!)'});
+                    this.router.navigate(['/app']);
                 } else {
                     if (data.code === 'resend') {
                         this.unconfirmed = true;

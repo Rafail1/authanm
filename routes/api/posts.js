@@ -2,7 +2,6 @@ const iga = require('../../models/instagramAcount');
 const igp = require('../../models/instagramPost');
 module.exports = function (router) {
     router.route('/instagram').get(function(req, res, next) {
-        console.log(req.user);
         const page = req.query.page ? req.query.page : 1;
         igp.paginate({}, {page: page, limit: 10}, function (err, posts) {
             if(err) {

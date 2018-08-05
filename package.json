@@ -48,7 +48,9 @@
     "rxjs-compat": "latest",
     "serve-favicon": "^2.5.0",
     "uniqid": "^5.0.3",
-    "zone.js": "^0.8.26"
+    "zone.js": "^0.8.26",
+    "http-proxy": "latest",
+    "request": "latest"
   },
   "devDependencies": {
     "@angular-devkit/build-angular": "~0.6.3",
