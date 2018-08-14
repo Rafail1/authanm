@@ -9,7 +9,11 @@ export class Account {
         type: Number,
         port: Number,
     };
-    constructor() {
-        this.proxy = {login: null, host: null, password: null, type: null, port: null};
+    constructor(account?) {
+        if (account.proxy) {
+            this.proxy = account.proxy;
+        } else {
+            this.proxy = {login: null, host: null, password: null, type: null, port: null};
+        }
     }
 }

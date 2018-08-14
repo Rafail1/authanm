@@ -16,10 +16,13 @@ schema.pre('save', function (done) {
         done(err);
     });
 });
+schema.methods.getUrl = function () {
+    const protocol = protocols[this['type'] - 1];
+    return `${protocol}://${this['login']}:${this['password']}@${this['host']}:${this['port']}`;
+};
 schema.statics.check = function (proxy) {
     return new Promise(function (resolve, reject) {
-        const protocol = protocols[proxy['type'] - 1];
-        const proxyUrl = `${protocol}://${proxy['login']}:${proxy['password']}@${proxy['host']}:${proxy['port']}`;
+        const proxyUrl = proxy.getUrl();
         const proxiedRequest = request.defaults({'proxy': proxyUrl});
         proxiedRequest.get("https://www.instagram.com", function (err) {
             if (err) {
