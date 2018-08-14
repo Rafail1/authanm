@@ -1,0 +1,12 @@
+.navbar-fixed-left {
+    border-radius: 0;
+    height: 100%;
+}
+.navbar-fixed-left .navbar-nav > li {
+    float: none;
+}
+
+.navbar-fixed-left .navbar-nav > li > .dropdown-menu {
+    margin-left: 20px;
+    border: none;
+}

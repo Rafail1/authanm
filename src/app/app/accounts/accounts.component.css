@@ -1,0 +1,58 @@
+.account-card {
+    box-shadow: 0 10px 10px -5px rgba(0, 0, 0, 0.4);
+    background: #4285f4;
+    color: #fff;
+    position: relative;
+    padding: 5px 10px;
+    border-radius: 0 9px 9px 9px;
+    transition: all ease-in-out 200ms;
+    cursor: pointer;
+}
+.account-card:hover {
+    box-shadow: 0 9px 8px -8px rgba(0, 0, 0, 0.4);
+    transform: translate(0px, 3px);
+}
+
+.account-card-body {
+    display: flex;
+    align-items: center;
+}
+
+.account-card-img {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    overflow: hidden;
+}
+
+
+
+.account-card-login {
+    margin: 0;
+    width: 200px;
+    overflow: hidden;
+    text-align: center;
+}
+
+.account-delete-button {
+    height: 50%;
+    width: 100%;
+    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #ddd;
+    border-bottom-right-radius: 7px;
+}
+
+.account-edit-button {
+    height: 50%;
+    color:#fff;
+    width: 100%;
+    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #ffe000e0;
+    border-top-right-radius: 7px;
+}

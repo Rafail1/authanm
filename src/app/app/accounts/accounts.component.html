@@ -1,0 +1,16 @@
+<div class="col-4" *ngFor="let account of accounts">
+        <div class="account-card wrapper-inner-overlay">
+            <div class="account-card-body">
+                <div class="account-card-img">
+                    <img src="{{account.photo}}">
+                </div>
+                <h5 class="account-card-login">{{account.login}}</h5>
+            </div>
+            <div class="inner-overlay right-inner-overlay">
+                <a class="account-edit-button icon-pencil" routerLink="/app/edit-account/{{account._id}}"></a>
+                <div class="account-delete-button icon-bin2" (click)="deleteAccount(account._id)"></div>
+            </div>
+        </div>
+
+</div>
+<a routerLink="/app/add-account">add</a>
