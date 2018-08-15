@@ -39,6 +39,11 @@ export class EditAccountComponent implements OnInit, OnDestroy {
 
     editAccount() {
         console.log(this.account);
+        this.http.put('api/accounts', {account: this.account}).subscribe(
+            data => {
+                console.log(data);
+            }
+        );
     }
 
     ngOnDestroy() {

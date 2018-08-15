@@ -34,6 +34,9 @@ module.exports = function (router) {
                 res.json({error: true, message: 'Ошибка добавления аккаунта'})
             })
         }
+    }).put(vt.verifyToken, function (req, res) {
+        const q = Object.assign({uid: req.userId}, req.body);
+        res.json(q);
     }).delete(vt.verifyToken, function (req, res) {
         const q = {uid: req.userId, _id: mongoose.Types.ObjectId(req.query.id)};
         Account.remove(q, function (err, accounts) {
