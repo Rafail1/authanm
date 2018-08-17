@@ -1,6 +1,7 @@
 <div class="container">
     <div class="mt-5">
-        <form class="form-horizontal" role="form" method="POST" (ngSubmit)="login(ngloginForm)" #ngloginForm="ngForm" action="/api/login">
+        <form class="form-horizontal" role="form" method="POST" (ngSubmit)="login(ngloginForm)" #ngloginForm="ngForm"
+              action="/api/login">
             <div class="row">
                 <div class="col-6 offset-3">
                     <h2>Вход</h2>
@@ -45,14 +46,16 @@
             <div class="row" style="padding-top: 1rem">
                 <div class="col-6 offset-3">
                     <div class="btn-group">
-                    <button type="submit" [disabled]="!ngloginForm.form.valid" class="btn btn-success"><i
-                            class="fa fa-sign-in"></i> Войти
-                    </button>
-                    <button [hidden]="!unconfirmed" type="button" [hidden]="!unconfirmed" class="btn btn-primary btn-xs" (click)="resend()"
-                            role="button">Выслать письмо повторно
-                    </button>
+                        <button type="submit" [disabled]="!ngloginForm.form.valid" class="btn btn-success"><i
+                                class="fa fa-sign-in"></i> Войти
+                        </button>
+                        <button [hidden]="!unconfirmed" type="button" [hidden]="!unconfirmed"
+                                class="btn btn-primary btn-xs" (click)="resend()"
+                                role="button">Выслать письмо повторно
+                        </button>
                     </div>
                     <a class="btn btn-link" [routerLink]="['/password-reset']">Забыли пароль?</a>
+                    <a class="btn btn-link float-right" [routerLink]="['/register']">Регистрация</a>
                 </div>
             </div>
         </form>

@@ -21,6 +21,8 @@ export class Account {
             } else {
                 this.proxy = {login: null, host: null, password: null, type: null, port: null};
             }
+        } else {
+            this.proxy = {login: null, host: null, password: null, type: null, port: null};
         }
     }
 }
